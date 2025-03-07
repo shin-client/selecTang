@@ -1,0 +1,70 @@
+name: selec Tang
+
+on:
+  workflow_dispatch:
+    inputs:
+      input_url:
+        description: 'Select the URL of the input file'
+        type: choice  # Kiểu input là menu thả xuống
+        required: true  # Bắt buộc chọn
+        options:
+          - 'Test 1'
+          - 'Test 2'
+          - 'Test 3'
+          - 'Test 4'
+          - 'Test 5'
+        default: 'Test 1'  # Giá trị mặc định
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install g++
+        run: sudo apt-get update && sudo apt-get install -y g++
+
+      - name: Show hardware info
+        run: |
+          echo "=== CPU Info ==="
+          cat /proc/cpuinfo | grep "model name" | head -n 1  # Tên CPU
+          echo "Number of CPUs: $(nproc)"  # Số lõi CPU
+          echo
+          echo "=== Memory Info ==="
+          free -h  # Thông tin RAM
+          echo
+          echo "=== Disk Info ==="
+          df -h  # Thông tin ổ cứng
+
+      - name: Download input file
+        run: |
+          case "${{ github.event.inputs.input_url }}" in
+            "Test 1")
+              URL="https://drive.google.com/uc?id=1NcHkXl0ky3lcISsV7lrQ0i6dTzYjjJJs"
+              ;;
+            "Test 2")
+              URL="https://drive.google.com/uc?id=1OB8-89XhYBRTzUBdvboDKOU3eSr4_5wo"
+              ;;
+            "Test 3")
+              URL="https://drive.google.com/uc?id=1h__8wvhqLmrJAxsMIzNucNSzCqvsyn0z"
+              ;;
+            "Test 4")
+              URL="https://drive.google.com/uc?id=1QBDCAqcmjCXSWVqIZHGWkInzpNzzSeXi"
+              ;;
+            "Test 5")
+              URL="https://drive.google.com/uc?id=1iyDPj_QK_2ZOerP_QFmzm6q7ePgOBrA8"
+              ;;
+          esac
+          pip install gdown
+          gdown -O test.txt "$URL"
+
+      - name: Compile C++ program
+        run: g++ -o main main.cpp
+
+      - name: Run C++ program
+        run: ./main
+          
+      - name: In ket qua
+        run: cat output.txt
